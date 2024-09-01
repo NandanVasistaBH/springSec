@@ -13,6 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.ndn.springSec.filter.JwtFilter;
 
 @Configuration // telling spring boss this is a configuration class use for that
 @EnableWebSecurity // telling spring go with the config mentioned below not the default one
@@ -20,6 +23,8 @@ public class SecurityConfig {
 
     @Autowired(required = true)
     private UserDetailsService userDetailsService;
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -39,6 +44,7 @@ public class SecurityConfig {
 
         // as we have disabled csrf we need to make each req a new session to enhance sec by making each session stateless
         http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
         
