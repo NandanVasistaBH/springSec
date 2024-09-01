@@ -297,8 +297,22 @@ it is used to put on checks on the request before it hits the appropriate contro
 
 
 
+CSRF : cross site request forging
+when login is done : server gives a session ID
+so u go into mallicious website and they take your session ID of a popular legit website which u also use 
+and start making request on behalf
 
+Spring sec also solves this problem
+Http is a stateless protocol , thats the reason why u need session ID in the first place to remember to the server i am the same user
 
+so along with session id , u need to send CSRF token u which u recieve from the server each time you do a NON-GET http request
+to send that u need to put in http headers as X-CSRF-TOKEN as key 
+going a post without this token will give u a 401 unauthorized
 
-
-
+so first get csrf token from req body of http
+{
+    "token": "XRxxK309ZTAwbg1H-u_y0t-jQiCKDyb-sl1vadnDR-t6SQfDaSlHTR8KUQYdWWh-ycLG5uiQbxi6PkfThjlZWbj1IdgbLzH0",
+    "headerName": "X-CSRF-TOKEN",
+    "parameterName": "_csrf"
+}
+now take this token with the same client if u do a post request it will work
