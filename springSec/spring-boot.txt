@@ -1,0 +1,304 @@
+in early 2000s before we had spring which had EJB  Jakarta Enterprise Beans
+EJB is a server-side software component that encapsulates business logic of an application
+
+but it difficult to manage them and it was heavy 
+
+so people came up with concept of POJO ( PLAIN OLD JAVA OBJECT )
+
+So Spring features
+1) pojo 2) Dependency Injection 3) MVC 4) REST 5) security 6)Batch 7) AOP : 
+Aspect-oriented programming (AOP) is an approach to programming that allows global properties of a program to determine how it is compiled into an executable program.
+
+
+the one main problem of spring 
+is configuration and working with the external JAR files
+
+
+to deploy a traditional Spring backend 
+Hardware -> OS -> Tomcat server -> APP(WAR file)
+
+spring boot gives a embedded server : the WAR file given will have embedded tom cat server 
+tomcat server :  It provides a "pure Java" HTTP web server environment in which Java code can also run.
+
+so now spring boot can run on any JVM 
+Hardware -> OS -> APP
+
+therefore by all these spring boot makes sure devs focus on the convention not on the configuration
+
+but if there is any configuration needs to be done : just go to application.properties file and do it
+no need to configure in XML files
+
+
+
+
+
+what is dependency Injection (it is one of the design pattern)?
+why to use ?
+say u wanna build a laptop
+class MAC{
+	SamsungRam ram = new SamsungRam();
+}
+
+now MAC should always have ram of samsung
+so in future if it changes to someother company it will affect entire laptop so u use interface 
+class MAC{
+	Ram ram = new SamsungRam();
+}
+but still when u use new keyword : we will still have tight coupling 
+
+so inorder to have lose coupling we need some service which injects the RAM object into laptop 
+this is done via dependency injection container 
+it is the responsibility of the this dependency injection container to create a RAM object and give it to MAC
+
+so how to de-couple but still maintain the Link
+
+
+class MAC {
+	@Autowired
+	RAM ram;
+}
+
+@Component
+class SamsungRam implements RAM {
+	
+}
+
+this tells spring boot that this is class of Ram type and u can use this implementation where ever it is needed
+
+this will not only help in lose coupling but also helps in testing in modular way
+
+
+
+
+on top of JVM there is a spring container . this container will have different objects there objects are called Spring Bean
+
+there are different type of scope there are 2 main types (but more are there) prototype and singleton(default)
+
+the container will make sure it creates objects( called as beans) of those classes which has to be injected as dependencies
+these objects are created by spring boot and is there is the spring container
+to make a object a BEAN u need to mention @Component before the corresponding class signature
+
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+		//	Alien a = new Alien(); now this is tight coupling
+		// you want lose coupling
+		ConfigurableApplicationContext ctx = SpringApplication.run(DemoApplication.class, args);
+		Alien a = ctx.getBean(Alien.class); // injecting alien
+		a.show();
+
+		Alien a1 = ctx.getBean(Alien.class); // injecting alien
+		a1.show(); // there is just one object created irrespecitive whether you reference it or not
+		// cuz by default beans are singleton
+	}
+
+}
+package com.example.demo;
+
+import org.springframework.stereotype.Component;
+
+@Component // makes sure this is now a bean
+public class Alien {
+    private int aid;
+    private String aname;
+    private String tech;
+
+    public Alien() {
+        System.out.println("object created");
+    }
+
+    public int getAid() {
+        return aid;
+    }
+
+    public void setAid(int aid) {
+        this.aid = aid;
+    }
+
+    public String getAname() {
+        return aname;
+    }
+
+    public void setAname(String aname) {
+        this.aname = aname;
+    }
+
+    public String getTech() {
+        return tech;
+    }
+
+    public void setTech(String tech) {
+        this.tech = tech;
+    }
+    public void show(){
+        System.out.println("hi");
+    }
+}
+
+@Component // makes sure this is now a bean
+@Scope(value = "prototype") // we are overriding singleton pattern of beans , and only when ctx.getBean is called an object is created and given
+public class Alien {
+}
+
+
+
+----------------------------------
+psvm
+ConfigurableApplicationContext ctx = SpringApplication.run(DemoApplication.class, args);
+		Alien a = ctx.getBean(Alien.class); // injecting alien
+		a.show();
+
+
+@Component // makes sure this is now a bean
+public class Alien {
+    private int aid;
+    private String aname;
+    private String tech;
+    @Autowired
+    private Laptop alienLaptop; // notice here we haven't instantiated it with new keyword
+    // but we need to link it to Laptop class as of now . this can change to someother later
+package com.example.demo;
+
+import ch.qos.logback.core.net.SyslogOutputStream;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Laptop {
+    private int lid;
+    private String brand;
+
+    @Override
+    public String toString() {
+        return "Laptop{" +
+                "lid=" + lid +
+                ", brand='" + brand + '\'' +
+                '}';
+    }
+    public void compile(){
+        System.out.println("compiling");
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public int getLid() {
+        return lid;
+    }
+
+    public void setLid(int lid) {
+        this.lid = lid;
+    }
+}
+
+
+
+BY DEFAULT AUTOWIRED SEARCHES BY TYPE
+AND QUALIFIER SEARCHES BY NAME
+ 
+@Component("MAC")
+public class Laptop {
+}@Component // makes sure this is now a bean
+public class Alien {
+    private int aid;
+    private String aname;
+    private String tech;
+    @Autowired
+    @Qualifier("MAC")
+    private Laptop alienLaptop; 
+} 
+
+------------------------------------------------------------------------==========================================---------------------
+web app
+-------------
+spring.mvc.view.prefix=/pages/
+spring.mvc.view.suffix=.html 
+
+u can change this from .html to .jsp .serverlets 
+doesn't affect the application code 
+
+
+
+--- springboot = spring+embedded server-XML bean config
+there are many sister projects associated to spring boot which makes developing in spring boot easy
+like spring data , spring batch and spring security , spring social and spring integration
+
+
+
+adv of spring boot 
+1) stand alone application which can be started with war or jar file
+2) embedded tomcat server
+3) opinionated starting config in pom.xml file
+
+
+
+Spring Boot Annotations:
+@Required: It applies to the bean setter method. It indicates that the annotated bean must be populated at configuration time with the required property, else it throws an exception BeanInitilizationException.
+@Autowired: Here, the spring container auto-wires the bean by matching data-type.
+@ComponentScan: Used when we want to scan a package for beans. It is used with the annotation @Configuration. We can also specify the base packages to scan for Spring Components.
+@Bean: It is a method-level annotation. It is an alternative of XML <bean> tag. It tells the method to produce a bean to be managed by Spring Container
+@Component: a class level annotation to mark a class as a bean
+@Controller: a class level annotation to serve web pages
+@Service: used at classs level. it tells that class contain business logic
+
+
+
+-----------
+GET , POST , PUT : replaces all the existing representation of the resouce
+PATCH : partial changes are done to the exisiting resource , DELETE
+
+
+-------------
+Richardson Maturity Model developed to grade API based on how they adherence to REST contraint
+the 3 main factors are URI , HTTP methods and hateoas ( hyper media)
+
+level 0 : http is used only as transport protocol . Uses a single URI and single http method . Only POST is allowed
+eg : /users to get and post data about all users
+
+level 1 : multiple URI based resource and single verb  : each resource is mapped to a specific URI
+POST /dept/<dept_id>/emp
+GET /dept/<dept_id>/emp/<emp_id>
+
+level 2 : multiple URI based resource with http verbs ( verbs are HTTP response status and codes given 200OK 404 not found)
+
+level3: level2+HATEOS : it helps in self-documentation . HATEOS helps to guide where the resouce is 
+
+
+
+
+
+
+
+===========================================================================
+spring sec
+how does spring sec works ?
+ how does that login form pops up when u try to access some page
+there are multiple controllers which u have written , and client sends request to these
+Spring web comes in two forms Serverlets ( which we are using ) and the other is reactive
+so in this case every controller is getting converted into a serverlet which makes it possible to run on a tomcat
+before each req hits the controller there is a front-controller also called DISPATCHER SERVERLET ( this is what spring sec helps us to modify)
+Spring sec adds multiple filters like UsernamePasswordAuthenticationFilter DefaultLoginPageGeneratingFilter etc
+
+with the help of these filters u can manipulate both the req and resp but its not used for that 
+it is used to put on checks on the request before it hits the appropriate controlllers
+
+
+
+
+
+
+
+
