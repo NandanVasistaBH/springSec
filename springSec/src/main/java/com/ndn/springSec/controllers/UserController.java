@@ -14,7 +14,7 @@ public class UserController {
     @Autowired
     private Userservice service;
     @PostMapping("/register")
-    public User register(@RequestBody User user){
+    public String register(@RequestBody User user){
         System.out.println(user);
         return service.register(user);
     }

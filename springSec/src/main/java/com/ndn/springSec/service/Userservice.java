@@ -22,10 +22,10 @@ public class Userservice {
     
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
-    public User register(User user) {
+    public String register(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         userRepo.save(user);
-        return user;
+        return jwtService.generateToken(user.getUsername());
     }  
     
     public String verify(User user) {
